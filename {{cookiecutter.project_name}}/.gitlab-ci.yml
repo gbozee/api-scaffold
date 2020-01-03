@@ -1,0 +1,120 @@
+stages:
+  - test
+  - deploy_serverless
+  # - build
+  # - deploy_prod
+
+cache:
+  paths:
+    - node_modules/.cache.
+    - .yarn-cache
+# variables:
+#   CONTAINER_IMAGE: registry.gitlab.com/tuteria/v2/authentication-service
+#   WEBSERVER_IMAGE: registry.gitlab.com/tuteria/v2/devops/caddy
+test:
+  stage: test
+  image: python:3.6
+  services:
+    - redis
+  script:
+    - python -m pip install --upgrade pip
+    - python -m pip install -r requirements-test.txt
+    - pytest tests
+  only:
+    - develop
+
+# build:
+#   stage: build
+#   image: docker:git
+#   services:
+#     - docker:dind
+
+#   script:
+#     - docker login -u gbozee -p $MY_GITLAB_PASSWORD registry.gitlab.com
+#     - docker build -t $CONTAINER_IMAGE .
+#     - docker push $CONTAINER_IMAGE:latest
+
+#   only:
+#     - master
+#     - develop
+
+deploy_serverless:
+  image: node:lts-slim
+  stage: deploy_serverless
+  environment:
+    name: $CI_PROJECT_NAME-git-$CI_COMMIT_REF_SLUG.$CI_PROJECT_NAMESPACE
+    url: https://$CI_ENVIRONMENT_NAME.now.sh/
+  before_script:
+    - apt-get update -qq && apt-get install
+    - echo "deploying"
+    - npm install -g now
+  script:
+    - echo "CI_COMMIT_REF_NAME ${CI_COMMIT_REF_NAME}"
+    - echo "CI_PROJECT_PATH_SLUG ${CI_COMMITCI_PROJECT_PATH_SLUG_REF_NAME}"
+    - echo "CI_COMMIT_REF_SLUG ${CI_COMMIT_REF_SLUG}"
+    - echo "GITLAB_USER_LOGIN ${GITLAB_USER_LOGIN}"
+    - 'export AVATAR_JSON=$(curl -s -H "JOB-TOKEN: $CI_JOB_TOKEN" "${CI_API_V4_URL}/users/${GITLAB_USER_ID}")'
+    - export AVATAR_URL=$(echo ${AVATAR_JSON}| node -e 'console.log(JSON.parse(require("fs").readFileSync(0, "utf8")).avatar_url)')
+    - echo "Avatar URL = ${AVATAR_URL}"
+    - now --prod
+      -t $NOW_TOKEN
+      -m gitlabDeployment=1
+      -m gitlabProjectNamespace="${CI_PROJECT_NAMESPACE}"
+      -m gitlabProjectName="${CI_PROJECT_NAME}"
+      -m gitlabProjectId="${CI_PROJECT_ID}"
+      -m gitlabProjectPath="${CI_PROJECT_PATH}"
+      -m gitlabCommitRef="${CI_COMMIT_REF_SLUG}"
+      -m gitlabCommitSha="${CI_COMMIT_SHA}"
+      -m gitlabCommitMessage="${CI_COMMIT_MESSAGE}"
+      -m gitlabCommitAuthorLogin="${GITLAB_USER_LOGIN}"
+      -m gitlabCommitAuthorName="${GITLAB_USER_NAME}"
+      -m gitlabCommitAuthorAvatar="${AVATAR_URL}"
+      -b GITLAB_DEPLOYMENT=1
+      -b GITLAB_PROJECT_NAMESPACE="${GITLAB_USER_NAME}"
+      -b GITLAB_PROJECT_NAME="${CI_PROJECT_NAME}"
+      -b GITLAB_PROJECT_ID="${CI_PROJECT_ID}"
+      -b GITLAB_PROJECT_PATH="${CI_PROJECT_PATH}"
+      -b GITLAB_COMMIT_REF="${CI_COMMIT_REF_SLUG}"
+      -b GITLAB_COMMIT_SHA="${CI_COMMIT_SHA}"
+      -b GITLAB_COMMIT_MESSAGE="${CI_COMMIT_MESSAGE}"
+      -b GITLAB_COMMIT_AUTHOR_LOGIN="${GITLAB_USER_LOGIN}"
+      -b GITLAB_COMMIT_AUTHOR_NAME="${GITLAB_USER_NAME}"
+  when: on_success
+  except:
+    - master
+
+# deploy_prod:
+#   stage: deploy_prod
+#   image: python:2.7
+#   before_script:
+#     ##
+#     ## Install ssh-agent if not already installed, it is required by Docker.
+#     ## (change apt-get to yum if you use an RPM-based image)
+#     ##
+#     - "which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )"
+
+#     ##
+#     ## Run ssh-agent (inside the build environment)
+#     ##
+#     - eval $(ssh-agent -s)
+
+#     ##
+#     ## Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+#     ## We're using tr to fix line endings which makes ed25519 keys work
+#     ## without extra base64 encoding.
+#     ## https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_48526556
+#     ##
+#     - echo "$PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+
+#     ##
+#     ## Create the SSH directory and give it the right permissions
+#     ##
+#     - mkdir -p ~/.ssh
+#     - chmod 700 ~/.ssh
+#   script:
+#     - python -m pip install fabric==1.13.2
+#     - fab deploy_current:$PRODUCTION_PASSWORD,$MY_GITLAB_PASSWORD,service={{cookiecutter.project_slug}}
+#     # - source deploy.sh $SENTRY_TOKEN `git describe --tags` $CI_COMMIT_SHA staging https://backup.tuteria.com
+#   only:
+#     - develop
+

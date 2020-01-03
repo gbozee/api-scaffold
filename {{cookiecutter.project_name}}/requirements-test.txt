@@ -1,0 +1,10 @@
+-r requirements.txt
+# Testing and CI
+mypy==0.720
+pytest==5.0.1
+ipython==7.6.1
+black==19.3b0
+ipdb==0.12
+pytest-mock==0.10.0
+pytest-asyncio==0.10.0
+-e .

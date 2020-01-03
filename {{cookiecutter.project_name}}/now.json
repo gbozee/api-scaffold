@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "name": "tuteria-{{cookiecutter.project_name}}",
+  "builds": [
+    {
+      "src": "index.py",
+      "use": "@now/python",
+      "config": {
+        "maxLambdaSize": "15mb"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/.*",
+      "dest": "/",
+      "headers": {
+        "cache-control": "s-maxage=604800",
+        "Access-Control-Allow-Origin": "*"
+      }
+    }
+  ],
+  "env": {
+    "DATABASE_URL": "@staging_database_url",
+    "REPLICA_DATABASE_URL": "@staging_replica_database_url",
+    "HOST_URL": "https://tuteria-{{cookiecutter.project_name}}.beesama.now.sh",
+    "CACHE_URL": "@staging_cache_url",
+    "SECRET_KEY": "@staging_secret_key",
+    "SENTRY_DSN": ""
+  },
+  "regions": ["cdg1", "lhr1"]
+}

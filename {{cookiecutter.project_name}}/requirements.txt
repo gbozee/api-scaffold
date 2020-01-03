@@ -1,0 +1,15 @@
+# Web framework
+starlette==0.12.4
+websockets==8.0.1
+https://github.com/gbozee/dalchemy/archive/0.0.7.zip
+{% if cookiecutter.form_processing == 'y' -%}
+python-multipart==0.0.5{% endif %}
+#authentication
+pyjwt[crypto]==1.7.1
+
+# Testing and CI
+requests==2.22.0
+httpx==0.8.0
+
+# Error reporting 
+sentry-sdk==0.13.5
