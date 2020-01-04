@@ -1,7 +1,8 @@
 # Web framework
-starlette==0.12.4
+starlette==0.13.0
 websockets==8.0.1
 https://github.com/gbozee/dalchemy/archive/0.0.7.zip
+https://github.com/gbozee/sstarlette/archive/0.0.4.zip
 {% if cookiecutter.form_processing == 'y' -%}
 python-multipart==0.0.5{% endif %}
 #authentication

@@ -33,7 +33,7 @@ def get_packages(package):
 setup(
     name="{{cookiecutter.project_name}}",
     version=get_version("{{cookiecutter.project_slug}}"),
-    python_requires=">=3.7",
+    python_requires=">=3.6",
     license="BSD",
     description="{{cookiecutter.project_short_description}}",
     long_description=get_long_description(),
@@ -44,7 +44,7 @@ setup(
     # package_data={"databases": ["py.typed"]},
     # data_files=[("", ["LICENSE.md"])],
     install_requires=[
-        "starlette==0.12.4",
+        "starlette>=0.13.0",
         "websockets==8.0.1",
         'dalchemy @ git+https://github.com/Tuteria/shared_lib.git@master',
     ],

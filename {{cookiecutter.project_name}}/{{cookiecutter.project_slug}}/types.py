@@ -1,6 +1,5 @@
 import typing
 
-
 class AuthorizedUser(typing.NamedTuple):
     user: str
     auth_roles: typing.List[str]

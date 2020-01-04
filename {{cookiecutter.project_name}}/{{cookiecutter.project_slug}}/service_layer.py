@@ -19,3 +19,10 @@ def decode_access_token(access_token, **kwargs):
         access_token, str(settings.SECRET_KEY), algorithms=ALGORITHM, **kwargs
     )
     return decoded_value
+
+async def demo(post_data,query_params=None, headers=None)->types.SampleResult:
+    return types.SampleResult(data={'hello':'world'})
+
+service = {
+    "/demo":{"func":demo,'methods':['GET']}
+}
