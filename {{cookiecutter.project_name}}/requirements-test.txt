@@ -5,6 +5,7 @@ pytest==5.0.1
 ipython==7.6.1
 black==19.3b0
 ipdb==0.12
+pdbpp
 pytest-mock==0.10.0
 pytest-asyncio==0.10.0
 -e .

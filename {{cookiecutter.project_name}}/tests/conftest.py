@@ -2,19 +2,22 @@ import asyncio
 import base64
 import json
 import os
-import databases
 import httpx
 import pytest
-from alembic import command
-from alembic.config import Config
 from starlette.config import environ
 from starlette.testclient import TestClient
 environ["TESTING"] = "True"
+{% if cookiecutter.sql_database == 'y' -%}
+from alembic import command
+from alembic.config import Config
+import databases
 environ["DATABASE_URL"] = os.getenv("TEST_DATABASE_URL")
-from {{cookiecutter.project_slug}} import models, settings
+from {{cookiecutter.project_slug}} import models
 from {{cookiecutter.project_slug}}.models import init_tables
-from {{cookiecutter.project_slug}}.views import app
 from orm.test_utils import *
+{% endif %}
+from {{cookiecutter.project_slug}} import settings
+from {{cookiecutter.project_slug}}.views import app
 
 
 @pytest.fixture
@@ -22,7 +25,7 @@ def client():
     return httpx.AsyncClient(app=app, base_url="http://test_server")
     # return httpx.Client(app=app,base_url="http://test_server")
     # return TestClient(app, raise_server_exceptions=True)
-
+{% if cookiecutter.sql_database == 'y' -%}
 @pytest.fixture(scope="session")
 def metadata(database):
     metadata = init_tables(database)
@@ -55,7 +58,7 @@ def monkeysession(request):
     mpatch = MonkeyPatch()
     yield mpatch
     mpatch.undo()
-
+{% endif %}
 
 @pytest.fixture
 def create_future():

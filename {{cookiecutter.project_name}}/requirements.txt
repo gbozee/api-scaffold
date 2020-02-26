@@ -1,16 +1,19 @@
 # Web framework
-starlette==0.13.0
-websockets==8.0.1
-https://github.com/gbozee/dalchemy/archive/0.0.7.zip
-https://github.com/gbozee/sstarlette/archive/0.0.4.zip
+-e .
+https://github.com/gbozee/sstarlette/archive/0.0.23.zip
+
+# Storage 
+{% if cookiecutter.sql_database == 'y' -%}https://github.com/gbozee/dalchemy/archive/0.0.8.zip {% endif %}
 {% if cookiecutter.form_processing == 'y' -%}
 python-multipart==0.0.5{% endif %}
+{% if cookiecutter.auth_backend == 'y' -%}
 #authentication
 pyjwt[crypto]==1.7.1
+{% endif %}
 
 # Testing and CI
 requests==2.22.0
 httpx==0.8.0
 
 # Error reporting 
-sentry-sdk==0.13.5
+{% if cookiecutter.sentry_support == 'y' -%}sentry-sdk==0.13.5{% endif %}

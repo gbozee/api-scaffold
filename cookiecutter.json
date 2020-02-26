@@ -6,5 +6,10 @@
   "project_short_description": "Python Boilerplate contains all the boilerplate you need to create a Python package.",
   "version": "0.0.1",
   "form_processing": "y",
-  "auth_backend": "y"
+  "auth_backend": "y",
+  "sql_database": "y",
+  "sentry_support": "y",
+  "serverless_deploy": "y",
+  "zeit_now_deploy": "y",
+  "use_redis": "no"
 }
